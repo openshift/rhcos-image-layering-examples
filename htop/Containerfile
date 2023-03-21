@@ -1,0 +1,7 @@
+#Start from your base image(more info at https://docs.openshift.com/container-platform/4.13/post_installation_configuration/coreos-layering.html#coreos-layering)
+#This example uses a RHEL 9.2 image from a 4.13 nightly.
+FROM registry.ci.openshift.org/ocp/4.13-2023-03-19-110337@sha256:42e45dd0ba1be3d2681972d6d38c42008c70ddb8c5a96f1f770a11f9bbfb048f
+#Enable EPEL (more info at https://docs.fedoraproject.org/en-US/epel/ ) and install htop
+RUN rpm-ostree install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm && \
+    rpm-ostree install htop && \
+    ostree container commit

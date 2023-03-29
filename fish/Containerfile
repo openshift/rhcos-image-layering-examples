@@ -1,0 +1,13 @@
+# Get RHCOS base image of target cluster `oc adm release info --image-for rhel-coreos`
+# This example uses rhel-coreos image from 4.13.0-rc.0
+FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:42e45dd0ba1be3d2681972d6d38c42008c70ddb8c5a96f1f770a11f9bbfb048f
+
+# RHEL entitled host is needed here to access RHEL packages
+# Create symlink to have RHEL entitlement and redhat.repo available at correct location inside container build
+RUN ln -s /run/secrets/redhat.repo /etc/yum.repos.d/redhat.repo && \
+    ln -s /etc/pki/entitlement-host/ /etc/pki/entitlement && \
+    # Install fish as third party package from EPEL
+    rpm-ostree install https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/f/fish-3.3.1-3.el9.x86_64.rpm && \
+    rm /etc/yum.repos.d/redhat.repo && \
+    rm -r /etc/pki/entitlement && \
+    ostree container commit

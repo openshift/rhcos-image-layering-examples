@@ -2,7 +2,11 @@
 # This example uses rhel-coreos image from 4.13.0-rc.2
 FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
 
+# Install our config file
+ADD my-host-to-host.conf /etc/ipsec.d/
+
 # RHEL entitled host is needed here to access RHEL packages
 # Install libreswan as extra RHEL package
 RUN rpm-ostree install libreswan && \
+    systemctl enable ipsec && \
     ostree container commit

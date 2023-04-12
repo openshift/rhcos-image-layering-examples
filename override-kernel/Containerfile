@@ -1,0 +1,10 @@
+# Get RHCOS base image of target cluster `oc adm release info --image-for rhel-coreos`
+FROM quay.io/openshift-release-dev/...
+
+# Enable cliwrap; this is currently required to intercept some command invocations made from
+# kernel scripts.
+RUN rpm-ostree cliwrap install-to-root /
+# Replace the kernel packages.  Note as of RHEL 9.2+, there is a new kernel-modules-core that needs
+# to be replaced.
+RUN rpm-ostree override replace https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/kernel-{,core-,modules-,modules-core-,modules-extra-}5.14.0-295.el9.x86_64.rpm && \
+    ostree container commit

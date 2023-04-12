@@ -1,0 +1,8 @@
+# Get RHCOS base image of target cluster `oc adm release info --image-for rhel-coreos`
+# This example uses rhel-coreos image from 4.13.0-rc.2
+FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+
+# RHEL entitled host is needed here to access RHEL packages
+# Install libreswan as extra RHEL package
+RUN rpm-ostree install libreswan && \
+    ostree container commit

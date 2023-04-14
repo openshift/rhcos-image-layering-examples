@@ -1,0 +1,10 @@
+# Get RHCOS base image of target cluster `oc adm release info --image-for rhel-coreos`
+# This example uses rhel-coreos image from 4.13.0-rc.2
+FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+
+# This example installs to /usr/local/bin, so to work around this, create a dir behind the symlink
+# After install, move the binary to /usr/bin/ for CLI use.
+RUN mkdir -p /var/usrlocal/bin && \ 
+    rpm -Uvh https://github.com/mozilla/sops/releases/download/v3.7.3/sops-3.7.3-1.x86_64.rpm && \
+    mv /var/usrlocal/bin/sops /usr/bin/sops && \
+    ostree container commit

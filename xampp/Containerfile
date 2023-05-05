@@ -1,0 +1,17 @@
+# Get RHCOS base image of target cluster `oc adm release info --image-for rhel-coreos`
+# This example uses rhel-coreos image from 4.13.0-rc.2
+FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+
+# This example installs to /opt/, so to work around this, create a dir behind the symlink
+# After install, move the binaries to /usr/lib/, set up a tmpfiles.d file for handling
+# the /opt/lampp symlinks
+RUN mkdir -p /var/opt && \
+    curl -L https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/8.2.4/xampp-linux-x64-8.2.4-0-installer.run/download --output /tmp/xampp-linux-x64-8.2.0-0-installer.run && \
+    chmod a+x /tmp/xampp-linux-x64-*-installer.run && \
+    ./tmp/xampp-linux-x64-*-installer.run && \
+    mv /var/opt/lampp/ /usr/lib/lampp && \
+    rm /tmp/xampp-linux-x64-*-installer.run && \
+    echo 'd /var/opt 755 root root -' >> /usr/lib/tmpfiles.d/lampp.conf && \
+    echo 'L+ /usr/lib/lampp/lampp - - - - /usr/lib/lampp/xampp' >> /usr/lib/tmpfiles.d/lampp.conf && \
+    echo 'L+ /opt/lampp - - - - /usr/lib/lampp' >> /usr/lib/tmpfiles.d/lampp.conf && \
+    ostree container commit

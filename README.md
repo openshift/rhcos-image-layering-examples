@@ -22,3 +22,6 @@ that just sets up an SSH key
 ### Testing on an OpenShift cluster
 
 See the [documentation](https://docs.openshift.com/container-platform/4.12/post_installation_configuration/coreos-layering.html#coreos-layering).
+
+## Test
+Adding it to test ci run on a PR.

@@ -1,8 +1,14 @@
 BINARY_NAME=dir-walker
 
 build:
-	go build -o dir-walker dir-walker.go
+	go build -o ${BINARY_NAME} dir-walker.go
 
 clean:
 	go clean
-	rm dir-walker
+	rm ${BINARY_NAME}
+
+install: build
+	install -D -m 0755 ${BINARY_NAME} $(DESTDIR)/opt/${BINARY_NAME}
+
+run: build
+	./${BINARY_NAME}

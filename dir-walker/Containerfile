@@ -1,0 +1,26 @@
+# Building the example app from source
+# This is a contrived example that traverses through all directories in a given path and returns the largest 10 files. 
+FROM golang:1.19 AS build-stage
+WORKDIR /app
+ADD dir-walker.go Makefile .
+RUN make install DESTDIR=./dir-walker-install && tar -C dir-walker-install -cf dir-walker-install.tar .
+
+# Get RHCOS base image of target cluster `oc adm release info --image-for rhel-coreos`
+# hadolint ignore=DL3006
+FROM quay.io/openshift-release/ocp-release@sha256...
+
+#Drop in the tarball from the build stage. ADD can be used if the package is being directly added from the host and not being built. 
+COPY --from=build-stage /app/dir-walker-install.tar /tmp/dir-walker-install.tar
+
+# This example "installs" to /opt/, so to work around this, first create a dir behind the existing symlink(/opt->/var/opt/)
+# After install, move the binary to /usr/lib/ for CLI use in the future. Then, set up symlink(s) via tmpfiles.d, so the binary & supporting files
+# typically stored in opt can be called in the future.
+
+# Note: The "install" step here is just unrolling the tarball; but it can be replaced by other methods to install a package(rpm-ostree install, rpm)
+# as long as the correct symlinks/directories are set up post install.
+RUN mkdir -p /var/opt && \
+    cd / && tar xf /tmp/dir-walker-install.tar && rm -f /tmp/dir-walker-install.tar && \
+    mv /opt/dir-walker /usr/lib/dir-walker && \
+    echo 'd /var/opt 755 root root -' >> /usr/lib/tmpfiles.d/dir-walker.conf && \
+    echo 'L+ /opt/dir-walker - - - - /usr/lib/dir-walker' >> /usr/lib/tmpfiles.d/dir-walker.conf && \
+    ostree container commit

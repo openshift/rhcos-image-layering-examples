@@ -1,0 +1,8 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-ybettan-external-image
+spec:
+  osImageURL: quay.io/ybettan/coreos-layering:simple-kmod

@@ -1,0 +1,25 @@
+ARG DTK_IMAGE
+ARG RHCOS_IMAGE
+
+# hadolint ignore=DL3006
+FROM ${DTK_IMAGE} as builder
+ARG KERNEL_VERSION
+
+WORKDIR /build/
+
+RUN git clone https://github.com/openshift-psap/simple-kmod.git
+
+WORKDIR /build/simple-kmod
+
+RUN make all install KVER=${KERNEL_VERSION}
+
+
+# hadolint ignore=DL3006
+FROM ${RHCOS_IMAGE}
+ARG KERNEL_VERSION
+
+COPY --from=builder /etc/driver-toolkit-release.json /etc/
+COPY --from=builder /lib/modules/${KERNEL_VERSION}/*.ko /usr/lib/modules/${KERNEL_VERSION}/
+
+# This is needed in order to autoload the module at boot time.
+RUN depmod -a "${KERNEL_VERSION}" && echo simple_kmod > /etc/modules-load.d/simple_kmod.conf

@@ -1,6 +1,6 @@
 # Get RHCOS base image of target cluster `oc adm release info --image-for rhel-coreos`
 # hadolint ignore=DL3006
-FROM quay.io/openshift-release/ocp-release@sha256...
+FROM quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256...
 
 # This example installs to /usr/local/bin, so to work around this, create a dir behind the symlink
 # After install, move the binary to /usr/bin/ for CLI use.
